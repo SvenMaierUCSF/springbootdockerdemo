@@ -1,0 +1,36 @@
+# Name of the workflow
+name: CI/CD Pipeline for Docker
+
+# Define the events that trigger the workflow
+on:
+  push: # Trigger the workflow on push events
+    branches:
+      - main # Only trigger on pushes to the main branch
+  pull_request: # Trigger the workflow on pull request events
+    branches:
+      - main # Only trigger on pull requests to the main branch
+
+# Define the jobs to be run as part of the workflow
+jobs:
+  build:
+    runs-on: ubuntu-latest # Specify the runner environment
+
+    steps:
+      - name: Checkout code # Step to checkout the repository code
+        uses: actions/checkout@v4 # Use the pre-built checkout action
+      - name: Set up JDK 17 # Step to set up Java Development Kit version 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin' # See 'Supported distributions' for available options
+          java-version: '17'
+      - name: Build with Maven # Step to build the project using Maven
+        run: mvn clean install # Run the Maven clean and install commands
+
+      - name: Login to Docker Hub # Step to log in to Docker Hub
+        run: docker login -u ${{secrets.DOCKER_USERNAME}} -p ${{secrets.DOCKER_PASSWORD}}  # Login with secrets
+
+      - name: Build Docker image # Step to build the Docker image
+        run: docker build -t svenmaier/spring-boot-docker-example-repo:v1.0 . # Build the Docker image with the specified tag
+
+      - name: Push Docker image # Step to push the Docker image to Docker Hub
+        run: docker push svenmaier/spring-boot-docker-example-repo:v1.0 # Push the Docker image with the specified tag
