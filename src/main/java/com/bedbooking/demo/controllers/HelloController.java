@@ -15,4 +15,9 @@ public class HelloController {
     public String helloWorld() {
         return helloMessage;
     }
+
+    @GetMapping("/welcome")
+    public String welcome() {
+        return "Let's learn Docker with GitHub actions!";
+    }
 }
